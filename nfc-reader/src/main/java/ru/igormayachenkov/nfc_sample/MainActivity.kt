@@ -27,6 +27,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
+import ru.igormayachenkov.nfc.PassportKey
 import ru.igormayachenkov.nfc.PassportReaderState
 import ru.igormayachenkov.nfc_sample.ui.theme.AiEnginesTheme
 
@@ -39,13 +40,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
+
+        // Get saved passport key
+        val passportKey = PassportKey(
+            // My Old
+            passportNumber = "711423874",
+            expirationDate = "200722",
+            birthDate = "711027"
+            // My New
+            //        val passportNumber = "762863213"
+            //        val expirationDate = "300320"
+            //        val birthDate      = "711027"
+        )
+
         // Create a ViewModel the first time the system calls an activity's onCreate() method.
         // Re-created activities receive the same MyViewModel instance created by the first activity.
-
-
-        // Create a ViewModel the first time the system calls an activity's onCreate() method.
-        // Re-created activities receive the same MyViewModel instance created by the first activity.
-        model = ViewModelProvider(this).get(MainViewModel::class.java)
+        //model = ViewModelProvider(this).get(MainViewModel::class.java)
+        model = ViewModelProvider(owner = this, factory = MainViewModelFactory(passportKey))
+            .get(MainViewModel::class.java)
 
         setContent {
             AiEnginesTheme {

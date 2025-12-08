@@ -7,13 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.nfc.tech.IsoDep
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import ru.igormayachenkov.nfc.PassportKey
 import ru.igormayachenkov.nfc.PassportReader
 import ru.igormayachenkov.nfc.ReadingEngineScuba
 
 private const val TAG = "myapp.ViewModel"
 
-class MainViewModel : ViewModel() {
+class MainViewModel(passportKey: PassportKey) : ViewModel() {
     //----------------------------------------------------------------------------------------------
     // DATA
     val passportReader = PassportReader()
@@ -25,25 +27,20 @@ class MainViewModel : ViewModel() {
     // IMPLEMENTATION
     init {
         Log.d(TAG, "init")
-        passportReader.passportKeyFlow.value = PassportKey(
-            // From Julia
-//        passportNumber = "715599956",
-//        expirationDate = "210802",
-//        birthDate      = "971010"
-            // My Old
-            passportNumber = "711423874",
-            expirationDate = "200722",
-            birthDate = "711027"
-            // My New
-            //        val passportNumber = "762863213"
-            //        val expirationDate = "300320"
-            //        val birthDate      = "711027"
-        )
-
+        passportReader.passportKeyFlow.value = passportKey
     }
     override fun onCleared() {
         super.onCleared()
         Log.d(TAG, "destroy")
     }
+
+}
+
+class MainViewModelFactory(val passportKey: PassportKey) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        if(modelClass.isAssignableFrom(MainViewModel::class.java))
+            MainViewModel(passportKey) as T
+        else throw IllegalArgumentException("Unknown ViewModel class")
 
 }
