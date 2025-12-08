@@ -2,6 +2,7 @@
 package ru.igormayachenkov.nfc_sample
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -33,25 +34,39 @@ import ru.igormayachenkov.nfc_sample.ui.theme.AiEnginesTheme
 
 
 private const val TAG = "myapp.MainActivity"
+private const val BUNDLE_KEY = "passportKey"
 
 class MainActivity : ComponentActivity() {
     private lateinit var model : MainViewModel
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val passportKey = model.passportReader.passportKeyFlow.value
+        Log.d(TAG, "onSaveInstanceState passportKey: $passportKey")
+        outState.putParcelable(BUNDLE_KEY, passportKey)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate")
+        Log.d(TAG, "onCreate, savedInstanceState: $savedInstanceState")
 
         // Get saved passport key
-        val passportKey = PassportKey(
-            // My Old
-            passportNumber = "711423874",
-            expirationDate = "200722",
-            birthDate = "711027"
-            // My New
-            //        val passportNumber = "762863213"
-            //        val expirationDate = "300320"
-            //        val birthDate      = "711027"
-        )
+        val passportKey =
+          ( if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                savedInstanceState?.getParcelable(BUNDLE_KEY, PassportKey::class.java)
+            else
+                savedInstanceState?.getParcelable(BUNDLE_KEY)
+          ) ?: PassportKey(
+              // Empty
+              passportNumber = "",
+              expirationDate = "",
+              birthDate      = ""
+              // My Old
+//              passportNumber = "711423874",
+//              expirationDate = "200722",
+//              birthDate      = "711027"
+          )
+        Log.d(TAG, "onCreate, passportKey: $passportKey")
 
         // Create a ViewModel the first time the system calls an activity's onCreate() method.
         // Re-created activities receive the same MyViewModel instance created by the first activity.

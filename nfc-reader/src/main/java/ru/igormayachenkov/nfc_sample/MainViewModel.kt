@@ -26,7 +26,7 @@ class MainViewModel(passportKey: PassportKey) : ViewModel() {
     //----------------------------------------------------------------------------------------------
     // IMPLEMENTATION
     init {
-        Log.d(TAG, "init")
+        Log.w(TAG, "init, passportKey: $passportKey")
         passportReader.passportKeyFlow.value = passportKey
     }
     override fun onCleared() {
